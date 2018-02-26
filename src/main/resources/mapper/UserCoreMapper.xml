@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.vastio.basic.dao.UserCoreMapper">
+    <select id="selectUserResponses" resultType="com.vastio.basic.entity.response.UserResponse">
+        SELECT
+            a.id,
+            a.role_id,
+            a.username,
+            a.full_name,
+            a.org_id,
+            a.create_time,
+            a.modify_time,
+            b.name AS p_name,
+            c.name AS b_name
+        FROM BASE_USER a LEFT JOIN BASE_ORG b
+                ON a.org_id = b.code
+            LEFT JOIN BASE_ORG c
+                ON b.parent_id = c.id
+    </select>
+</mapper>
