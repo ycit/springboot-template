@@ -53,7 +53,7 @@ public class OrganizationController extends BaseController {
     @SystemLog(module = "基础模块", method = "查询所有组织机构", description = "查询所有组织机构树形结构")
     @GetMapping("/organizationTree")
     public ResponseResult<OrganizationTreeVo> getOrganizationTree() {
-        return success(organizationServiceCore.getOrgTree());
+        return successResult(organizationServiceCore.getOrgTree());
     }
 
 }

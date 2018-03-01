@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.vastio.basic.aop.SystemLog;
 import com.vastio.basic.common.model.User;
+import com.vastio.basic.common.model.UserRole;
+import com.vastio.basic.common.service.IUserRoleService;
 import com.vastio.basic.common.service.IUserService;
 import com.vastio.basic.controller.base.BaseController;
 import com.vastio.basic.entity.requset.UserRequest;
@@ -13,6 +15,7 @@ import com.vastio.basic.entity.response.ResponseResult;
 import com.vastio.basic.entity.response.UserResponse;
 import com.vastio.basic.service.UserServiceCore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,9 +34,13 @@ import java.util.Date;
  */
 @RestController
 @RequestMapping("/api")
+@Transactional
 public class UserController extends BaseController {
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private IUserRoleService userRoleService;
 
     @Autowired
     private UserServiceCore userServiceCore;
@@ -48,9 +55,17 @@ public class UserController extends BaseController {
         }
         User user = userRequest.transfer();
         user.setCreateTime(new Date());
-        if (userService.insert(user)) {
+        Integer id = userServiceCore.getUserId();
+        user.setId(id);
+
+        UserRole userRole = new UserRole();
+        userRole.setUserId(id);
+        userRole.setRoleId(userRequest.getRoleId());
+        userRole.setCreateTime(new Date());
+        if (userService.insert(user) && userRoleService.insert(userRole)) {
             return success("创建成功");
         }
+
         return error("未知错误", 400);
     }
 
@@ -87,7 +102,7 @@ public class UserController extends BaseController {
     public ResponseResult<User> getUserById(@PathVariable(value = "id") String userId) {
         User user = userService.selectById(userId);
         user.setPassword(null);
-        return success(user);
+        return successResult(user);
     }
 
     @SystemLog(module = "基础模块", method = "查询用户", description = "按条件查询用户")

@@ -17,4 +17,9 @@
             LEFT JOIN BASE_ORG c
                 ON b.parent_id = c.id
     </select>
+    <select id="getUserId" resultType="java.lang.Integer">
+        SELECT BASE_USER_SEQ.NEXTVAL FROM dual
+    </select>
+
+
 </mapper>

@@ -16,4 +16,9 @@ public class UserServiceCoreImpl implements UserServiceCore {
     public Page<UserResponse> getUserInfo(Page<UserResponse> page) {
         return page.setRecords(mapper.selectUserResponses(page));
     }
+
+    @Override
+    public Integer getUserId() {
+        return mapper.getUserId();
+    }
 }
