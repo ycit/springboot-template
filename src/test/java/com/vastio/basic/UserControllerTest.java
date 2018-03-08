@@ -2,7 +2,6 @@ package com.vastio.basic;
 
 import com.alibaba.fastjson.JSONObject;
 import com.vastio.basic.entity.requset.UserRequest;
-import com.vastio.basic.entity.requset.UserUpdateRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +37,7 @@ public class UserControllerTest {
     public void testQueryUsers() throws Exception {
         mvc.perform(get("/api/user")
                 .param("curPage", "1")
-                .param("pageSize","2"))
+                .param("pageSize", "2"))
                 .andExpect(status().isOk());
     }
 
@@ -56,20 +55,18 @@ public class UserControllerTest {
     }
 
 
-
     @Test
     public void testUpdateUser() throws Exception {
-        UserUpdateRequest userUpdateRequest = new UserUpdateRequest();
-        userUpdateRequest.setId(4);
+        UserRequest userUpdateRequest = new UserRequest();
         userUpdateRequest.setUsername("sss");
         userUpdateRequest.setOrgId(3211l);
-        mvc.perform(put("/api/user")
+        mvc.perform(put("/api/user/4")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .content(JSONObject.toJSONString(userUpdateRequest)))
                 .andExpect(status().isOk());
         userUpdateRequest.setUsername("二二");
-        mvc.perform(put("/api/user")
+        mvc.perform(put("/api/user/4")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .content(JSONObject.toJSONString(userUpdateRequest)))

@@ -27,8 +27,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class OrganizationController extends BaseController {
+    private final OrganizationServiceCoreImpl organizationServiceCore;
+
     @Autowired
-    private OrganizationServiceCoreImpl organizationServiceCore;
+    public OrganizationController(OrganizationServiceCoreImpl organizationServiceCore) {
+        this.organizationServiceCore = organizationServiceCore;
+    }
 
     @SystemLog(module = "基础模块", method = "查询分局", description = "查询分局")
     @GetMapping("/branch")

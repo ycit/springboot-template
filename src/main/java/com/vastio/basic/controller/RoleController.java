@@ -7,19 +7,10 @@ import com.vastio.basic.common.model.Role;
 import com.vastio.basic.common.service.IRoleService;
 import com.vastio.basic.controller.base.BaseController;
 import com.vastio.basic.entity.requset.RoleRequest;
-import com.vastio.basic.entity.requset.RoleUpdateRequest;
 import com.vastio.basic.entity.response.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
@@ -31,11 +22,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class RoleController extends BaseController {
-    @Autowired
-    private IRoleService roleService;
+    private final IRoleService roleService;
 
     @Value("${custom.menu-path}")
     private String menuPath;
+
+    @Autowired
+    public RoleController(IRoleService roleService) {
+        this.roleService = roleService;
+    }
 
     @SystemLog(module = "基础模块", method = "角色查询", description = "根据角色名和角色描述模糊查询")
     @GetMapping("/roles")
@@ -72,10 +67,11 @@ public class RoleController extends BaseController {
     }
 
     @SystemLog(module = "基础模块", method = "更新角色", description = "更新角色")
-    @PutMapping("/role")
-    public ResponseResult<String> updateRole(@RequestBody RoleUpdateRequest roleRequest) {
+    @PutMapping("/role/{id}")
+    public ResponseResult<String> updateRole(@PathVariable(value = "id") Integer id,
+                                             @RequestBody RoleRequest roleRequest) {
         Role role = roleRequest.transfer();
-        role.setId(roleRequest.getId());
+        role.setId(id);
         role.setModifyTime(new Date());
         if (roleService.updateById(role)) {
             return success("更新角色成功");

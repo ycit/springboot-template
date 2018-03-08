@@ -3,30 +3,27 @@ package com.vastio.basic.controller;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
+import com.google.common.collect.ImmutableList;
 import com.vastio.basic.aop.SystemLog;
+import com.vastio.basic.common.model.AppConfig;
+import com.vastio.basic.common.model.Permission;
 import com.vastio.basic.common.model.User;
 import com.vastio.basic.common.model.UserRole;
+import com.vastio.basic.common.service.IAppConfigService;
 import com.vastio.basic.common.service.IUserRoleService;
 import com.vastio.basic.common.service.IUserService;
 import com.vastio.basic.controller.base.BaseController;
 import com.vastio.basic.entity.requset.UserRequest;
-import com.vastio.basic.entity.requset.UserUpdateRequest;
 import com.vastio.basic.entity.response.ResponseResult;
 import com.vastio.basic.entity.response.UserResponse;
 import com.vastio.basic.service.UserServiceCore;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * @author chenxy
@@ -36,20 +33,29 @@ import java.util.Date;
 @RequestMapping("/api")
 @Transactional
 public class UserController extends BaseController {
-    @Autowired
-    private IUserService userService;
+    private static final String USERNAME = "username";
+
+    private final IUserService userService;
+
+    private final IUserRoleService userRoleService;
+
+    private final IAppConfigService appConfigService;
+
+    private final UserServiceCore userServiceCore;
 
     @Autowired
-    private IUserRoleService userRoleService;
-
-    @Autowired
-    private UserServiceCore userServiceCore;
+    public UserController(IUserService userService, IUserRoleService userRoleService, IAppConfigService appConfigService, UserServiceCore userServiceCore) {
+        this.userService = userService;
+        this.userRoleService = userRoleService;
+        this.appConfigService = appConfigService;
+        this.userServiceCore = userServiceCore;
+    }
 
     @SystemLog(module = "基础模块", method = "创建用户", description = "创建用户")
     @PostMapping("/user")
     public ResponseResult<String> addUser(@RequestBody UserRequest userRequest) {
         EntityWrapper<User> condition = new EntityWrapper<>();
-        condition.eq("username", userRequest.getUsername());
+        condition.eq(USERNAME, userRequest.getUsername());
         if (userService.selectCount(condition) != 0) {
             return error("用户已存在", 400);
         }
@@ -70,19 +76,28 @@ public class UserController extends BaseController {
     }
 
     @SystemLog(module = "基础模块", method = "更新用户", description = "更新用户")
-    @PutMapping("/user")
-    public ResponseResult<String> updateUser(@RequestBody UserUpdateRequest userRequset) {
+    @PutMapping("/user/{id}")
+    public ResponseResult<String> updateUser(@PathVariable(value = "id") Integer id,
+                                             @RequestBody UserRequest userRequset) {
         EntityWrapper<User> condition = new EntityWrapper<>();
-        condition.eq("username", userRequset.getUsername());
+        condition.eq(USERNAME, userRequset.getUsername());
         if (userRequset.getUsername() != null
-                && !userRequset.getUsername().equals(userService.selectById(userRequset.getId()).getUsername())
+                && !userRequset.getUsername().equals(userService.selectById(id).getUsername())
                 && userService.selectCount(condition) != 0) {
             return error("用户已存在", 400);
         }
         User user = userRequset.transfer();
-        user.setId(userRequset.getId());
+        user.setId(id);
         user.setModifyTime(new Date());
-        if (userService.updateById(user)) {
+
+        EntityWrapper<UserRole> wrapper = new EntityWrapper<>();
+        UserRole userRole = new UserRole();
+        userRole.setUserId(id);
+        userRole.setRoleId(userRequset.getRoleId());
+
+        wrapper.eq("user_id", id);
+
+        if (userService.updateById(user) && userRoleService.update(userRole, wrapper)) {
             return success("更新成功");
         }
         return error("未知错误", 400);
@@ -91,7 +106,11 @@ public class UserController extends BaseController {
     @SystemLog(module = "基础模块", method = "删除用户", description = "删除用户")
     @DeleteMapping("/user/{id}")
     public ResponseResult<String> deleteUser(@PathVariable(value = "id") Integer userId) {
-        if (userService.deleteById(userId)) {
+        EntityWrapper<UserRole> wrapper = new EntityWrapper<>();
+        UserRole userRole = new UserRole();
+        userRole.setUserId(userId);
+        wrapper.setEntity(userRole);
+        if (userService.deleteById(userId) && userRoleService.delete(wrapper)) {
             return success("删除成功");
         }
         return error("未知错误", 400);
@@ -112,8 +131,49 @@ public class UserController extends BaseController {
         Page<UserResponse> page = new Page<>();
         page.setCurrent(curPage);
         page.setSize(pageSize);
-        page = userServiceCore.getUserInfo(page);
+        page = userServiceCore.getUserInfo(page, null);
+        List<UserResponse> userResponses = page.getRecords();
+        userResponses.forEach(temp -> {
+            if (temp.getBName() == null) {
+                temp.setBName(temp.getPName());
+                temp.setPName(null);
+            }
+        });
+
         return success(page.getRecords(), page.getTotal());
+    }
+
+    @GetMapping("/user/self")
+    public ResponseResult<Map<String, Object>> userInfo() {
+        Page<UserResponse> page = new Page<>();
+        page.setCurrent(1);
+        page.setSize(1);
+        Subject subject = SecurityUtils.getSubject();
+        String username = (String) subject.getPrincipal();
+        if (username == null) {
+            return error("未获取到用户信息,请先登入.", 400);
+        }
+
+        Map<String, Object> params = new HashMap<>();
+        params.put(USERNAME, username);
+        page = userServiceCore.getUserInfo(page, params);
+
+        Map<String, Object> result = new HashMap<>();
+        if (page.getRecords() != null) {
+            UserResponse userResponse = page.getRecords().get(0);
+            result.put("user", userResponse);
+        }
+
+        List<Permission> permissions = userServiceCore.getPermissionByUser(username);
+        result.put("permission", permissions);
+
+        EntityWrapper<AppConfig> wrapper = new EntityWrapper<>();
+        List<AppConfig> appConfigs = appConfigService.selectList(wrapper);
+        Map<String, String> appConfig = new HashMap<>();
+        appConfigs.forEach(temp -> appConfig.put(temp.getName(), temp.getValue()));
+        result.put("config", appConfig);
+
+        return success(ImmutableList.of(result), 1);
     }
 }
 

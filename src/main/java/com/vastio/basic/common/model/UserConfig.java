@@ -21,7 +21,7 @@ public class UserConfig extends Model<UserConfig> {
     @TableId("ID")
     private Integer id;
     @TableField("USER_ID")
-    private Integer userId;
+    private String userId;//这里指代用户名并非用户主键
     @TableField("NAME")
     private String name;
     @TableField("VALUE")

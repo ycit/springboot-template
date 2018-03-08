@@ -7,15 +7,9 @@ import com.vastio.basic.common.model.RolePermission;
 import com.vastio.basic.common.service.IPermissionService;
 import com.vastio.basic.common.service.IRolePermissionService;
 import com.vastio.basic.controller.base.BaseController;
-import com.vastio.basic.entity.requset.PermissionRequest;
 import com.vastio.basic.entity.response.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,11 +18,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class PermissionController extends BaseController {
-    @Autowired
-    private IPermissionService permissionService;
+    private final IPermissionService permissionService;
+
+    private final IRolePermissionService rolePermissionService;
 
     @Autowired
-    private IRolePermissionService rolePermissionService;
+    public PermissionController(IPermissionService permissionService, IRolePermissionService rolePermissionService) {
+        this.permissionService = permissionService;
+        this.rolePermissionService = rolePermissionService;
+    }
 
     @SystemLog(module = "基础模块", method = "查询所有权限", description = "查询所有权限")
     @GetMapping("/permission")
@@ -52,17 +50,18 @@ public class PermissionController extends BaseController {
     }
 
     @SystemLog(module = "基础模块", method = "更新角色权限", description = "更新角色权限")
-    @PutMapping("/permission")
-    public ResponseResult<String> updatePermission(@RequestBody PermissionRequest permissionRequest) {
+    @PutMapping("/permission/{id}")
+    public ResponseResult<String> updatePermission(@PathVariable(value = "id") Integer id,
+                                                   @RequestParam(value = "permission") List<Integer> permission) {
         EntityWrapper<RolePermission> wrapper = new EntityWrapper<>();
         RolePermission condition = new RolePermission();
-        condition.setRoleId(permissionRequest.getRoleId());
+        condition.setRoleId(id);
         rolePermissionService.delete(wrapper);
         List<RolePermission> rolePermissionList = new ArrayList<>();
-        permissionRequest.getPermission().forEach(e -> {
+        permission.forEach(e -> {
             RolePermission rolePermission = new RolePermission();
             rolePermission.setPermissionId(e);
-            rolePermission.setRoleId(permissionRequest.getRoleId());
+            rolePermission.setRoleId(id);
             rolePermission.setCreateTime(new Date());
             rolePermissionList.add(rolePermission);
         });

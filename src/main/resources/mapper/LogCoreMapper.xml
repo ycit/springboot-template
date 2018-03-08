@@ -16,7 +16,7 @@
         ON b.parent_id = c.id
         WHERE 1=1
         <if test="orgId != null">
-            AND a.org_id = #{orgId}
+            AND (a.org_id = #{orgId} OR c.code = #{orgId})
         </if>
         <if test="method == 'login'">
             AND d.method = #{method}

@@ -3,22 +3,27 @@
 <mapper namespace="com.vastio.basic.dao.UserCoreMapper">
     <select id="selectUserResponses" resultType="com.vastio.basic.entity.response.UserResponse">
         SELECT
-            a.id,
-            a.role_id,
-            a.username,
-            a.full_name,
-            a.org_id,
-            a.create_time,
-            a.modify_time,
-            b.name AS p_name,
-            c.name AS b_name
+        a.id,
+        a.role_id,
+        a.username,
+        a.full_name,
+        a.org_id,
+        a.create_time,
+        a.modify_time,
+        b.name AS p_name,
+        c.name AS b_name
         FROM BASE_USER a LEFT JOIN BASE_ORG b
-                ON a.org_id = b.code
-            LEFT JOIN BASE_ORG c
-                ON b.parent_id = c.id
+        ON a.org_id = b.code
+        LEFT JOIN BASE_ORG c
+        ON b.parent_id = c.id
+        WHERE 1=1
+        <if test="username != null">
+            AND a.username = #{username}
+        </if>
     </select>
     <select id="getUserId" resultType="java.lang.Integer">
-        SELECT BASE_USER_SEQ.NEXTVAL FROM dual
+        SELECT BASE_USER_SEQ.NEXTVAL
+        FROM dual
     </select>
 
 

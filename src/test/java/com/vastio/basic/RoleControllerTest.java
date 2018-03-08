@@ -2,7 +2,6 @@ package com.vastio.basic;
 
 import com.alibaba.fastjson.JSONObject;
 import com.vastio.basic.entity.requset.RoleRequest;
-import com.vastio.basic.entity.requset.RoleUpdateRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,7 +37,7 @@ public class RoleControllerTest {
     public void testQueryRole() throws Exception {
         mvc.perform(get("/api/roles")
                 .param("roleName", "分局派出所")
-                .param("roleDesc",""))
+                .param("roleDesc", ""))
                 .andExpect(status().isOk());
     }
 
@@ -64,11 +63,10 @@ public class RoleControllerTest {
 
     @Test
     public void testUpdateRole() throws Exception {
-        RoleUpdateRequest roleRequest = new RoleUpdateRequest();
-        roleRequest.setId(1);
+        RoleRequest roleRequest = new RoleRequest();
         roleRequest.setDescription("");
         roleRequest.setName("ee");
-        mvc.perform(put("/api/role")
+        mvc.perform(put("/api/role/3")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .content(JSONObject.toJSONString(roleRequest)))

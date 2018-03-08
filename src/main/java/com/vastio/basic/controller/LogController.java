@@ -18,8 +18,12 @@ import java.util.Date;
 @RestController
 @RequestMapping("/api")
 public class LogController extends BaseController {
+    private final SystemLogService systemLogService;
+
     @Autowired
-    private SystemLogService systemLogService;
+    public LogController(SystemLogService systemLogService) {
+        this.systemLogService = systemLogService;
+    }
 
     @GetMapping("/log/login")
     public ResponseResult<LogResponse> getLoginLog(@RequestParam(value = "curPage") Integer curPage,

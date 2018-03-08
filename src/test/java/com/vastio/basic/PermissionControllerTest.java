@@ -1,7 +1,6 @@
 package com.vastio.basic;
 
 import com.alibaba.fastjson.JSONObject;
-import com.vastio.basic.entity.requset.PermissionRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,15 +51,12 @@ public class PermissionControllerTest {
 
     @Test
     public void testUpdatePermission() throws Exception {
-        PermissionRequest permissionRequest = new PermissionRequest();
-        permissionRequest.setRoleId(3);
         List<Integer> list = new ArrayList<>();
         list.add(3);
-        permissionRequest.setPermission(list);
-        mvc.perform(put("/api/permission")
+        mvc.perform(put("/api/permission/3")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
-                .content(JSONObject.toJSONString(permissionRequest)))
+                .param("permission", JSONObject.toJSONString(list)))
                 .andExpect(status().isOk());
 
     }
