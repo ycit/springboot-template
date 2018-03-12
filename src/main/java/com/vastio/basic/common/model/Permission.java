@@ -28,6 +28,8 @@ public class Permission extends Model<Permission> {
      */
     @TableId("ID")
     private Integer id;
+    @TableField("PARENT_ID")
+    private Integer parentId;
     /**
      * 权限名称
      */

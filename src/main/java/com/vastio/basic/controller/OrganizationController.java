@@ -27,8 +27,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class OrganizationController extends BaseController {
+    private final OrganizationServiceCoreImpl organizationServiceCore;
+
     @Autowired
-    private OrganizationServiceCoreImpl organizationServiceCore;
+    public OrganizationController(OrganizationServiceCoreImpl organizationServiceCore) {
+        this.organizationServiceCore = organizationServiceCore;
+    }
 
     @SystemLog(module = "基础模块", method = "查询分局", description = "查询分局")
     @GetMapping("/branch")
@@ -53,7 +57,7 @@ public class OrganizationController extends BaseController {
     @SystemLog(module = "基础模块", method = "查询所有组织机构", description = "查询所有组织机构树形结构")
     @GetMapping("/organizationTree")
     public ResponseResult<OrganizationTreeVo> getOrganizationTree() {
-        return success(organizationServiceCore.getOrgTree());
+        return successResult(organizationServiceCore.getOrgTree());
     }
 
 }

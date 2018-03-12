@@ -15,7 +15,7 @@ public class BaseController {
         return responseResult;
     }
 
-    protected <T> ResponseResult<T> success(T result) {
+    protected <T> ResponseResult<T> successResult(T result) {
         ResponseResult<T> responseResult = new ResponseResult<>();
         responseResult.setCode(HttpServletResponse.SC_OK);
         List<T> list = new ArrayList<>();

@@ -20,7 +20,6 @@ import java.util.Date;
  */
 @TableName("BASE_USER")
 @Data
-@KeySequence(value = "BASE_USER_SEQ", clazz = Integer.class)
 public class User extends Model<User> {
 
     private static final long serialVersionUID = 1L;
