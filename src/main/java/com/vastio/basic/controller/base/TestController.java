@@ -89,6 +89,7 @@ public class TestController {
     public static void main(String[] args) {
         String str = CommonUtil.encoderByMD5("dsj@dpj287");
         LOGGER.debug(str);
+
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://www.baidu.com";
         String result = restTemplate.getForObject(url, String.class);
