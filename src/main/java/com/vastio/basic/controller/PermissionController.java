@@ -7,6 +7,7 @@ import com.vastio.basic.common.model.RolePermission;
 import com.vastio.basic.common.service.IPermissionService;
 import com.vastio.basic.common.service.IRolePermissionService;
 import com.vastio.basic.controller.base.BaseController;
+import com.vastio.basic.entity.requset.PermissionRequest;
 import com.vastio.basic.entity.response.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -52,13 +53,13 @@ public class PermissionController extends BaseController {
     @SystemLog(module = "基础模块", method = "更新角色权限", description = "更新角色权限")
     @PutMapping("/permission/{id}")
     public ResponseResult<String> updatePermission(@PathVariable(value = "id") Integer id,
-                                                   @RequestParam(value = "permission") List<Integer> permission) {
+                                                   @RequestBody PermissionRequest permissionRequest) {
         EntityWrapper<RolePermission> wrapper = new EntityWrapper<>();
         RolePermission condition = new RolePermission();
         condition.setRoleId(id);
         rolePermissionService.delete(wrapper);
         List<RolePermission> rolePermissionList = new ArrayList<>();
-        permission.forEach(e -> {
+        permissionRequest.getPermission().forEach(e -> {
             RolePermission rolePermission = new RolePermission();
             rolePermission.setPermissionId(e);
             rolePermission.setRoleId(id);

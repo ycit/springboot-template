@@ -9,6 +9,7 @@ import com.vastio.basic.common.service.IRoleService;
 import com.vastio.basic.common.service.IUserRoleService;
 import com.vastio.basic.common.service.IUserService;
 import com.vastio.basic.controller.base.BaseController;
+import com.vastio.basic.entity.requset.MenuRequest;
 import com.vastio.basic.entity.response.ResponseResult;
 import com.vastio.basic.util.FileUtil;
 import org.apache.shiro.SecurityUtils;
@@ -44,9 +45,9 @@ public class MenuController extends BaseController {
     @SystemLog(module = "基础模块", method = "更新菜单", description = "更新菜单")
     @PutMapping("/menu/{id}")
     public ResponseResult<String> updateMenu(@PathVariable(value = "id") Integer id,
-                                             @RequestParam(value = "menu") String menu) {
+                                             @RequestBody MenuRequest menuRequest) {
         String path = menuPath + File.separator + UUID.randomUUID().toString();
-        FileUtil.saveFile(menu, path);
+        FileUtil.saveFile(menuRequest.getMenu(), path);
 
         Role role = new Role();
         role.setPath(path);
