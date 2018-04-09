@@ -1,9 +1,9 @@
 # Spring Boot Basic项目
 
-##介绍
+## 介绍
 该项目是基于spring boot框架开发，其中主要包含了权限控制、应用配置管理及菜单管理功能。
       
-##项目使用技术
+## 项目使用技术
 1.加入了swagger api管理，swagger会管理所有包含@ApiOperation注解的控制器方法，同时，可利用@ApiImplicitParams注解标记接口中的参数
   
   ```
