@@ -1,6 +1,7 @@
 package com.vastio.basic.controller;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.vastio.basic.aop.SystemLog;
 import com.vastio.basic.common.model.AppConfig;
 import com.vastio.basic.common.model.UserConfig;
 import com.vastio.basic.common.service.IAppConfigService;
@@ -30,6 +31,7 @@ public class ConfigController extends BaseController {
         this.appConfigService = appConfigService;
     }
 
+    @SystemLog(module = "基础模块", method = "getAllUserConfig", description = "获取所有用户配置")
     @GetMapping("/userConfig")
     public ResponseResult<UserConfig> getAllUserConfig() {
         EntityWrapper<UserConfig> wrapper = new EntityWrapper<>();
@@ -42,6 +44,7 @@ public class ConfigController extends BaseController {
         return success(result, result.size());
     }
 
+    @SystemLog(module = "基础模块", method = "getUserConfigByKey", description = "根据key查询value")
     @GetMapping("/userConfig/{key}")
     public ResponseResult<UserConfig> getUserConfigByKey(@PathVariable(value = "key") String key) {
         EntityWrapper<UserConfig> wrapper = new EntityWrapper<>();
@@ -52,6 +55,7 @@ public class ConfigController extends BaseController {
         return successResult(result);
     }
 
+    @SystemLog(module = "基础模块", method = "getAllAppConfig", description = "查询所有应用系统配置")
     @GetMapping("/appConfig")
     public ResponseResult<AppConfig> getAllAppConfig() {
         EntityWrapper<AppConfig> wrapper = new EntityWrapper<>();
@@ -59,6 +63,7 @@ public class ConfigController extends BaseController {
         return success(result, result.size());
     }
 
+    @SystemLog(module = "基础模块", method = "getAppConfigByKey", description = "根据key查询value")
     @GetMapping("/appConfig/{key}")
     public ResponseResult<AppConfig> getAppConfigByKey(@PathVariable(value = "key") String key) {
         EntityWrapper<AppConfig> wrapper = new EntityWrapper<>();

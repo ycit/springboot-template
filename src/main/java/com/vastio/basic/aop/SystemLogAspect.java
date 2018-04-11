@@ -39,8 +39,12 @@ public class SystemLogAspect {
     private static final String UNKNOWN = "unknown";
     private HttpServletRequest request;
 
+    private final SystemLogService systemLogService;
+
     @Autowired
-    private SystemLogService systemLogService;
+    public SystemLogAspect(SystemLogService systemLogService) {
+        this.systemLogService = systemLogService;
+    }
 
     @Autowired
     public void setRequest(HttpServletRequest request) {
@@ -74,8 +78,7 @@ public class SystemLogAspect {
 
     @Around("methodSystemLogPointcut()")
     public Object doController(ProceedingJoinPoint joinPoint) throws Throwable {
-        Object result = null;
-        result = joinPoint.proceed();
+        Object result = joinPoint.proceed();
 
         try {
             Object[] args = joinPoint.getArgs();
@@ -90,7 +93,7 @@ public class SystemLogAspect {
                     }
                     continue;
                 }
-                condition.append(strings[i] + " = ");
+                condition.append(strings[i]).append(" = ");
                 condition.append(args[i]);
                 if (i < strings.length - 1) {
                     condition.append(" and ");
@@ -128,10 +131,9 @@ public class SystemLogAspect {
             ip = request.getRemoteAddr();
 
             if (ip.equals(ConstantEnum.LOCAL_HOST.getValue())) {
-                // 根据网卡取本机配置的IP
-                InetAddress inet = null;
                 try {
-                    inet = InetAddress.getLocalHost();
+                    // 根据网卡取本机配置的IP
+                    InetAddress inet = InetAddress.getLocalHost();
                     ip = inet.getHostAddress();
                 } catch (UnknownHostException e) {
                     logger.error(e.getMessage());
@@ -145,7 +147,7 @@ public class SystemLogAspect {
         return ip;
     }
 
-    public Map<String, String> getControllerMethodDescription(JoinPoint joinPoint) throws ClassNotFoundException {
+    private Map<String, String> getControllerMethodDescription(JoinPoint joinPoint) throws ClassNotFoundException {
         Map<String, String> map = new HashMap<>();
         String targetName = joinPoint.getTarget().getClass().getName();
         String methodName = joinPoint.getSignature().getName();

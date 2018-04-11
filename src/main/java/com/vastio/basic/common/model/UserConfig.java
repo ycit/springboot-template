@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
@@ -12,6 +13,7 @@ import java.io.Serializable;
  * @author chenxy
  * @since 2018-02-12
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName("BASE_USER_CONFIG")
 @Data
 public class UserConfig extends Model<UserConfig> {

@@ -11,8 +11,12 @@ import org.springframework.context.annotation.Configuration;
 @MapperScan(basePackages = {"com.vastio.basic.dao*", "com.vastio.basic.common.dao*"})
 @Configuration
 public class MybatisPlusConfig {
+    private final DruidProperties druidProperties;
+
     @Autowired
-    private DruidProperties druidProperties;
+    public MybatisPlusConfig(DruidProperties druidProperties) {
+        this.druidProperties = druidProperties;
+    }
 
     @Bean
     public DruidDataSource dataSource() {

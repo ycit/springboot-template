@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotations.TableField;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.Date;
  * @author chenxy
  * @since 2018-02-12
  */
+@EqualsAndHashCode(callSuper = true)
 @TableName("BASE_USER_ROLE")
 @Data
 @KeySequence(value = "BASE_USER_ROLE_SEQ", clazz = Integer.class)

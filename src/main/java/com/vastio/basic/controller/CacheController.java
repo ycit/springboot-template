@@ -1,5 +1,6 @@
 package com.vastio.basic.controller;
 
+import com.vastio.basic.aop.SystemLog;
 import com.vastio.basic.controller.base.BaseController;
 import com.vastio.basic.entity.response.ResponseResult;
 import com.vastio.basic.service.CacheService;
@@ -24,6 +25,7 @@ public class CacheController extends BaseController {
         this.cacheService = cacheService;
     }
 
+    @SystemLog(module = "基础模块", method = "updateCache", description = "更新缓存")
     @PostMapping("/caches/{key}")
     public ResponseResult<String> update(@PathVariable("key")String key, @RequestParam("value")String value) {
         cacheService.updateByKey(key, value);

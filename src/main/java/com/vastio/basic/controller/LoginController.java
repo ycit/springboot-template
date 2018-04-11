@@ -52,10 +52,10 @@ public class LoginController extends BaseController {
         return success("login success");
     }
 
-    @SystemLog(module = "基础模块", method = "退出登入", description = "退出登入")
+    @SystemLog(module = "基础模块", method = "logout", description = "退出登入")
     @GetMapping(value = "/logout")
     public void logout() {
-        Subject currentUser=SecurityUtils.getSubject();
+        Subject currentUser = SecurityUtils.getSubject();
         if (currentUser.isAuthenticated()) {
             currentUser.logout();
         }
