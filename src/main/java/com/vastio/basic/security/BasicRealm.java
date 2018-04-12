@@ -3,6 +3,7 @@ package com.vastio.basic.security;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.vastio.basic.common.model.User;
 import com.vastio.basic.common.model.UserRole;
+import com.vastio.basic.common.service.IRoleService;
 import com.vastio.basic.common.service.IUserRoleService;
 import com.vastio.basic.common.service.IUserService;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -36,6 +37,9 @@ public class BasicRealm extends AuthorizingRealm {
     @Autowired
     private IUserRoleService userRoleService;
 
+    @Autowired
+    private IRoleService roleService;
+
     // 授权
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
@@ -49,8 +53,9 @@ public class BasicRealm extends AuthorizingRealm {
             EntityWrapper<UserRole> userRoleEntityWrapper = new EntityWrapper<>();
             UserRole userRole = new UserRole();
             userRole.setUserId(user1.getId());
+            userRoleEntityWrapper.setEntity(userRole);
             List<UserRole> userRoles = userRoleService.selectList(userRoleEntityWrapper);
-            List<String> roles = userRoles.stream().map(userRole1 -> userRole1.getRoleId().toString()).collect(Collectors.toList());
+            List<String> roles = userRoles.stream().map(userRole1 -> roleService.selectById(userRole1.getRoleId()).getName()).collect(Collectors.toList());
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("roles is ============={}", roles.stream().collect(Collectors.joining(",")));
             }

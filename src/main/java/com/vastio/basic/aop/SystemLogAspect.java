@@ -87,7 +87,7 @@ public class SystemLogAspect {
             StringBuilder condition = new StringBuilder();
             condition.append("[");
             for (int i = 0; i < strings.length; i++) {
-                if (args[i] instanceof Model) {
+                if (args[i] instanceof Model||"password".equals(strings[i])) {
                     if (i == strings.length - 1) {
                         condition.delete(condition.length() - 5, condition.length() - 1);
                     }
