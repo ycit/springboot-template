@@ -57,6 +57,7 @@ public class PermissionController extends BaseController {
         EntityWrapper<RolePermission> wrapper = new EntityWrapper<>();
         RolePermission condition = new RolePermission();
         condition.setRoleId(id);
+        wrapper.setEntity(condition);
         rolePermissionService.delete(wrapper);
         List<RolePermission> rolePermissionList = new ArrayList<>();
         permissionRequest.getPermission().forEach(e -> {

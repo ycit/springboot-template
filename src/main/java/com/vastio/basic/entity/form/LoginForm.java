@@ -18,4 +18,10 @@ public class LoginForm {
     @NotEmpty
     private String password;
 
+    @Override
+    public String toString() {
+        return "LoginForm{" +
+                "username='" + username + '\'' +
+                '}';
+    }
 }
